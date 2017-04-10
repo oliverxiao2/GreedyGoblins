@@ -1,0 +1,28 @@
+{
+  "header":{
+    "firstPage":"",
+    "body": "",
+    "lastPage": ""
+  },
+  "body":{
+    "figures":[
+      {
+        "figureID": "1",
+        "title":" Fuel off/on adaption completed and OK, MQ",
+        "numChannelGroups":[
+          ["fsrstmx_w", "fseof_1_[0]", "fseof_w", "dfsofmedi_w"],
+          ["nmot_w", "midmd_w", "fofstat", "fonstat"],
+          ["bitsadapr_[0]", "bitsadapr_[1]", "bitsadapr_[2]"]
+        ],
+        "bitChannels":[
+          "B_adapfsr", "B_adapfsrst", "B_fofr", "B_fofrun", "B_fonr"
+        ]
+      }
+    ]
+  },
+  "footer":{
+    "firstPage": "",
+    "body": "",
+    "lastPage": ""
+  }
+}

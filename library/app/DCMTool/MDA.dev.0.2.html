@@ -1,0 +1,59 @@
+<head>
+  <link rel="stylesheet" href="../../mdl/material.min.css">
+  <script src="../../mdl/material.min.js"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<body>
+  <!-- Always shows a header, even in smaller screens. -->
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+      <!-- Title -->
+      <span class="mdl-layout-title">Greedy Goblins</span>
+      <!-- Add spacer, to align navigation to the right -->
+      <div class="mdl-layout-spacer"></div>
+      <!-- Navigation. We hide it in small screens. -->
+      <nav class="mdl-navigation mdl-layout--large-screen-only">
+        <a class="mdl-navigation__link" href="#">link1</a>
+        <a class="mdl-navigation__link" href="#" name="newGraph" onclick="dialog(this)">New Graph</a>
+        <a class="mdl-navigation__link" href="#">Save Document</a>
+        <a class="mdl-navigation__link" href="#">Save Graph</a>
+      </nav>
+    </div>
+  </header>
+  <!-- dialog -->
+  <dialog id="id-dialog-newGraph" class="mdl-dialog">
+    <h1 class="mdl-dialog__title">Choose the graph type</h1>
+    <div class="mdl-dialog__content">
+      <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-1">
+        <input type="radio" id="option-1" class="mdl-radio__button" name="options" value="1" checked>
+        <span class="mdl-radio__label">line</span>
+      </label>
+      <label class="mdl-radio mdl-js-radio mdl-js-ripple-effect" for="option-2">
+        <input type="radio" id="option-2" class="mdl-radio__button" name="options" value="2">
+        <span class="mdl-radio__label">bar</span>
+      </label>
+    </div>
+    <div class="mdl-dialog__actions">
+      <button type="button" class="mdl-button">Confirm</button>
+      <button type="button" class="mdl-button close">Cancel</button>
+    </div>
+  </dialog>
+  <!-- dialog end -->
+  <div class="mdl-layout__drawer">
+    <span class="mdl-layout-title">Imported</span>
+    <nav class="mdl-navigation">
+      <a class="mdl-navigation__link" href="">Link</a>
+    </nav>
+  </div>
+  <main class="mdl-layout__content">
+    <div class="page-content" style="margin: 0 auto;">
+      <!-- My content goes here -->
+      <div class="mdl-shadow--2dp" style="width:300px;height:100px;"></div>
+      <div class="mdl-shadow--2dp" style="width:300px;height:100px;"></div>
+
+      <!-- My content end -->
+    </div>
+  </main>
+</div>
+</body>

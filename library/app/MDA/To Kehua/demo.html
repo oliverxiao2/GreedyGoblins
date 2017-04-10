@@ -1,0 +1,203 @@
+<head>
+  <meta charset="utf-8">
+  <!--css-->
+  <link rel="stylesheet" type="text/css" href="assets/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="assets/fileinput.min.css">
+  <link rel="stylesheet" type="text/css" href="assets/jquery-ui.min.css">
+  <link rel="stylesheet" type="text/css" href="assets/jquery-ui.structure.min.css">
+  <!--<link rel="stylesheet" type="text/css" href="assets/font-awesome.3.0.2.min.css">-->
+  <!--js-->
+  <script src="assets/jquery-3.2.0.min.js"></script>
+  <script src="assets/jquery-ui.min.js"></script>
+  <script src="assets/bootstrap.min.js"></script>
+  <script src="assets/fileinput.min.js"></script>
+  <script src="assets/d3.v4.min.js"></script>
+  <script src="assets/MDF.1.1.js"></script>
+  <script src="assets/UAESMDA.dev.0.1.js"></script>
+</head>
+<body>
+  <!-- Modal Import Files -->
+  <div class="modal fade" id="id-modal-import" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="myModalLabel">Please Import Your Measurement Files</h4>
+        </div>
+        <div class="modal-body">
+          <input id="id-fileInput" class="file" type="file"
+           data-show-preview="false" data-show-upload="false"
+           data-allowed-file-extensions='["dat"]' multiple/>
+           <br />
+           <div class="panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">Panel heading</div>
+
+            <!-- Table -->
+            <table class="table">
+              <tr>
+                <th>File Name</th> <th>File Size</th>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" style="display:none;">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal select x&y of plot
+  <div class="modal fade" id="id-modal-addPlot" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">-->
+  <div id="id-dialog-addPlot" title="Select Channels">
+    <div>
+      <select id="id-select-mdf-file"></select>
+      <div class="form-group" style="max-height:500px;overflow-y:auto;">
+        <ul id="id-channel-list" class="list-group"></ul>
+      </div>
+    </div>
+  </div>
+  <!-- wrapper -->
+  <div id="wrapper">
+
+
+
+      <!-- Page Content -->
+      <div id="page-content-wrapper">
+          <div class="container-fluid">
+              <div class="row">
+                  <div class="col-lg-12">
+
+                      <!-- graph area -->
+                      <div id="id-workplace-paintBox" style="background:#EEE"></div>
+                      <div id="id-workplace-paintBox2" style="background:blue"></div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      <!-- /#page-content-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
+  <!-- Menu Toggle Script -->
+  <script>
+  // === UAESMDA ===
+  d3.UAESMDA=$("#id-workplace-paintBox").d3MDA();
+  // === MDFManager ===
+  d3.MDFManager = {"mdfArray":[], "totalMemorySize":0};
+
+  // === modal draggable event ===
+
+  $( "#id-dialog-addPlot" ).dialog({
+  	autoOpen: false,
+  	width: 400,
+  	buttons: [
+  		{
+        class:"ui-button ui-widget ui-corner-all",
+  			text: "Ok",
+  			click: function() {
+          let data = [], selectedMDF, selectedChannels = [];
+          const selectedMDFFileName = $("#id-select-mdf-file").val();
+          for (const mdf of d3.MDFManager.mdfArray){
+            console.log(mdf.name);
+            if (mdf.name == selectedMDFFileName){
+              selectedMDF = mdf;
+              break;
+            }
+          }
+
+          $("#id-channel-list").find(".channel-checkbox").each(function(){
+            const checked = $(this)[0].checked;
+            if(checked) selectedChannels.push($(this).val());
+          });
+
+          for (const chIndex of selectedChannels){
+            const ch = selectedMDF.data
+                        .readDataBlockOf(selectedMDF.data.channels[chIndex],selectedMDF.data.arrayBuffer);
+            const channelData = ch.rawDataArray.map(function(d){return ch.ccBlock.convert(d)});
+            data.push(channelData);
+          }
+          //console.log(data);
+          d3.UAESMDA.addPlot({masterChannel:data[0], channelGroup:[data[1]]});
+  			}
+  		},
+  		{
+        class:"btn btn-default",
+  			text: "Cancel",
+  			click: function() {
+  				$( this ).dialog( "close" );
+  			}
+  		}
+  	]
+  });
+  // === import event ===
+  $("#id-fileInput").change(function(){
+    const files = event.target.files;
+    for (let file of files){
+      let fr = new FileReader();
+      fr.readAsArrayBuffer(file);
+      fr.onload = function(e){
+        let arrayBuffer = e.target.result;
+        const mdf = new MDF(arrayBuffer, false);
+        console.log(mdf);
+        let channels = [];
+
+        for(const dgBlock of mdf.dgBlocks){
+          for (const cgBlock of dgBlock.cgBlocks){
+            for (const cnBlock of cgBlock.cnBlocks){
+              channels.push(cnBlock);
+            }
+          }
+        }
+
+        file["data"] = mdf;
+        file["data"]["channels"] = channels;
+        d3.MDFManager.mdfArray.push(file);
+        d3.MDFManager.totalMemorySize += mdf.arrayBuffer.byteLength;
+
+        $("#id-modal-import").find(".table").append("<tr><td>"+file.name+"</td><td>"+file.size+"</td></tr>");
+        $("#id-select-mdf-file").append("<option value="+file.name+">"+file.name+"</option>");
+
+        updateChannelList();
+      }
+    }
+  });
+
+  // === select mdf file event ===
+  $("#id-select-mdf-file").change(function(){
+    const fileName = $(this).val();
+    $("#id-channel-list").empty();
+    for (const file of d3.MDFManager.mdfArray){
+      if (file.name == fileName){
+        for (const [index,ch] of file.data.channels.entries()){
+          const checkbox='<input class="channel-checkbox" type="checkbox" value="'+index+'" name='+ch.shortSignalName+'>';
+          $("#id-channel-list").append("<li class='list-group-item'>"+checkbox+ch.shortSignalName+"</li>");
+        }
+      }
+    }
+  });
+
+  function updateChannelList(){
+    const fileName = $("#id-select-mdf-file").val();
+    $("#id-channel-list").empty();
+    for (const file of d3.MDFManager.mdfArray){
+      if (file.name == fileName){
+        for (const [index,ch] of file.data.channels.entries()){
+          const checkbox='<input class="channel-checkbox" type="checkbox" value="'+index+'" name='+ch.shortSignalName+'>';
+          $("#id-channel-list").append("<li class='list-group-item'>"+checkbox+ch.shortSignalName+"</li>");
+        }
+      }
+    }
+  }
+
+
+  //test1
+  var data1={masterChannel:[1,5,30,40,50], channelGroup:[[1,4,2,5,9], [2,4,3,4,6]]}
+  d3.UAESMDA.addPlot(data1);
+
+  //test2, ondrop file
+  a = d3.select("#id-workplace-paintBox2");
+  a.goblinsD3Painter();
+  </script>
+</body>

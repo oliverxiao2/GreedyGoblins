@@ -1,0 +1,265 @@
+<head>
+  <meta charset="utf-8">
+  <script src="library/vue/vue.js"></script>
+  <script>
+    // global namespace
+    if(!window.UAESNameSpace){
+      window.UAESNameSpace = {};
+    }
+    UAESNameSpace.a2lFiles = [];
+    UAESNameSpace.hexFiles = [];
+    UAESNameSpace.parseResults  = [];
+    /*
+      define resource
+    */
+    var resource = {
+      jquery: [
+        "library/jquery/jquery-3.2.0.min.js"
+      ],
+      bootstrap: [
+        "library/bootstrap/bootstrap.css",
+        "library/bootstrap/bootstrap.min.js"
+
+      ],
+      bootstrap_easyWizard: [
+        "library/bootstrap/easyWizard/easyWizard.css",
+        "library/bootstrap/easyWizard/easyWizard.js"
+      ],
+      jquery_fileinput: [
+        "library/jquery/UIComponents/fileinput/jquery-filestyle.min.css",
+        "library/jquery/UIComponents/fileinput/jquery-filestyle.min.js"
+      ],
+      jquery_select2: [
+        "library/jquery/UIComponents/select2/select2.min.css",
+        "library/jquery/UIComponents/select2/select2.min.js"
+      ],
+      dashboard: [
+        "assets/dashboard.css"
+      ],
+      bootstrap_select: [
+        "library/bootstrap/select/bootstrap-select.min.css",
+        "library/bootstrap/select/bootstrap-select.min.js"
+      ],
+      ASAMFileParser: [
+        "library/ASAM/fileParser.js"
+      ]
+      /*vue: [
+        "library/vue/vue.js"
+      ]
+      */
+    };
+
+    var require = function(resource = {}){
+      for (const n in resource){
+        for ( const path of resource[n]){
+          if (path.substr(path.length-3, 3) == ".js") {
+            let js = document.createElement("script");
+            js.src = path;
+            js.defer = true;
+            document.querySelector("head").appendChild(js);
+          }
+          else if (path.substr(path.length-4, 4) == ".css") {
+            let css = document.createElement("link");
+            css.rel = "stylesheet";
+            css.href = path;
+            document.querySelector("head").appendChild(css);
+          }
+        }
+      }
+    }
+
+    require(resource);
+  </script>
+</head>
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">检查机动队</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#">Dashboard</a></li>
+          <li><a href="#">Settings</a></li>
+          <li><a href="#">Profile</a></li>
+          <li><a href="#">Help</a></li>
+        </ul>
+        <form class="navbar-form navbar-right">
+          <input type="text" class="form-control" placeholder="Search...">
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+          <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+          <li><a href="#">Reports</a></li>
+          <li><a href="#">Analytics</a></li>
+          <li><a href="#">Export</a></li>
+        </ul>
+        <ul class="nav nav-sidebar">
+          <li><a href="">Nav item</a></li>
+          <li><a href="">Nav item again</a></li>
+          <li><a href="">One more nav</a></li>
+          <li><a href="">Another nav item</a></li>
+          <li><a href="">More navigation</a></li>
+        </ul>
+        <ul class="nav nav-sidebar">
+          <li><a href="">Nav item again</a></li>
+          <li><a href="">One more nav</a></li>
+          <li><a href="">Another nav item</a></li>
+        </ul>
+      </div>
+      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <h3 class="page-header">标定量检查工具</h3>
+        <div class="row placeholders">
+          <div id="easyWizard" class="modal-dialog" role="document" style="width:100%;">
+            <div class="modal-content">
+              <div class="modal-header">
+              </div>
+              <div class="modal-body wizard-content">
+                <div class="wizard-step">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <span>添加A2L文件</span>
+                      <input id="id-a2lFileInput" type="file" class="jfilestyle" data-placeholder="请添加一个A2L文件" data-inputSize="500px">
+                    </div>
+                  </div>
+                </div>
+                <div class="wizard-step">
+                  <div class="row">
+                    <input id="id-hexFileInput" type="file" class="jfilestyle" data-placeholder="请添加HEX文件" data-inputSize="600px" multiple>
+                    <!-- data-tokens="ketchup mustard"-->
+                    <select id="id-select-hexFileList" class="selectpicker" data-live-search="true" multiple data-max-options="2" data-width="fit">
+                    </select>
+                  </div>
+                </div>
+                <div class="wizard-step">
+                  <h4>选择进行比较的标定量</h4>
+                  <select id="id-select-compareWhat" class="selectpicker" data-live-search="true">
+                    <option>DINH</option> <!-- data-tokens="ketchup mustard"-->
+                    <option>ZOO</option>
+                    <option>ABC</option>
+                  </select>
+
+                </div>
+              </div>
+              <div class="modal-footer wizard-buttons">
+                <!-- The wizard button will be inserted here. -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="sub-header">检查结果</h3>
+        <div class="table-responsive">
+          <div class="col-md-3">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                </tr>
+              </thead>
+              <tbody id="id-checkResult-name">
+                <tr v-for="item in list">
+                  <td>{{item.name}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="col-md-3">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in list">
+                  <td>{{item.name}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+<!-- js running on this index page -->
+<script>
+  window.addEventListener("load", function(){
+
+    // initialize the step wizard
+    $("#easyWizard").wizard({
+        onfinish:function(){
+          let a2l = UAESNameSpace.a2lFiles[0];
+
+          let hexIDs = $("#id-select-hexFileList").val();
+
+          for (const ID of hexIDs){
+            UAESNameSpace.parseResults = (ASAMGetValue({
+              a2l: a2l,
+              hex: UAESNameSpace.hexFiles[parseInt(ID)],
+              charRegExp: $("#id-select-compareWhat").val()
+            }).CHARFound)
+          }
+          vue_checkResult.list = UAESNameSpace.parseResults;
+        }
+    });
+
+    // addEventListener of a2l file input
+    document.querySelector("#id-a2lFileInput").addEventListener("change", function(e){
+      let file = this.files[0];
+      let fr = new FileReader();
+      fr.readAsText(file);
+      fr.onload = function(e){
+        let r = e.target.result;
+        file.data = ASAMFileParser(r, "A2L");
+        UAESNameSpace.a2lFiles[0] = file;
+      }
+    });
+
+    // addEventListener of hex file input
+    document.querySelector("#id-hexFileInput").addEventListener("change", function(e){
+      let files = this.files;
+      for (const file of files){
+        let fr = new FileReader();
+        fr.readAsText(file);
+        fr.onload = function(e){
+          let r = e.target.result;
+          file.data = ASAMFileParser(r, "HEX");
+          if (file.data.length > 0){
+            UAESNameSpace.hexFiles.push(file);
+            //manually bind data to select
+            let option = document.createElement("option");
+            option.value = UAESNameSpace.hexFiles.length-1;
+            option.text = file.name;
+            document.querySelector("#id-select-hexFileList").appendChild(option);
+            $("#id-select-hexFileList").selectpicker("refresh"); // ! important
+          }
+        }
+      }
+    });
+
+  });
+  kkk = [1,2,3]
+  //
+  var vue_checkResult_col1 = new Vue({
+    el: "#id-checkResult-name",
+    data: {
+      list: UAESNameSpace.parseResults
+    }
+  });
+</script>

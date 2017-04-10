@@ -1,0 +1,91 @@
+html body{
+  width: 100%;
+  height: 100%;
+  background-color: #009966;
+}
+#div_body{
+  width: 100%;
+  height: 100%;
+  padding-top: 60px;
+}
+#div_files{
+  width: 1480px;
+  margin: 0 auto;
+  position: relative;
+  float: none;
+  left: 0px;
+  top:0px;
+  overflow-y: scroll;
+}
+#div_chart{
+  width: 100%;
+  position: absolute;
+  top: 60px;
+  display: none;
+}
+#div_chart_left{
+  width: 240px;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  overflow: scroll;
+}
+#div_chart_right{
+  margin-left: 7px;
+}
+#div_chart_right_0{
+  width: 100%;
+  height: 100%;
+}
+a{
+  cursor: pointer;
+}
+#mdfFileInput{
+  cursor: pointer;
+}
+#mdfFileInput{
+  opacity: 0;
+  position:absolute;
+  margin: auto;
+  left: 0px;
+  top: 5px;
+  width: 100%;
+  height: 26px;
+  z-index: 99;
+}
+#div_side{
+  width:600px;
+  height:640px;
+  position: absolute;
+  left: 0px;
+  top: 60px;
+  z-index: 999999;
+  display: none;
+}
+#div_channels, #div_do{
+  width: 1200px;
+  margin: 0 auto;
+}
+#div_chart_right_0 text{
+  font-family:"Consolas";
+  font-size: 10pt;
+}
+#div_chart_right_0 table td{
+  font-family: "Consolas";
+  font-size: 10pt;
+  font-style: italic;
+  vertical-align:top;
+  padding: 2px;
+}
+.infoTableContainder{
+  overflow: auto;
+  margin: 0px;
+  padding: 0px;
+  vertical-align: top;
+}
+.grid line{
+  stroke: lightgrey;
+  stroke-opacity: 0.7;
+}
+.grid path{
+  stroke-width: 0;
