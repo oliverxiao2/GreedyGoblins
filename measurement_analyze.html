@@ -1,0 +1,272 @@
+<head>
+  <meta charset="utf-8">
+  <script src="library/vue/vue.js"></script>
+  <script src="library/d3/d3.v4.min.js"></script>
+  <script src="library/jquery/jquery-3.2.0.min.js"></script>
+  <script>
+    // global namespace
+    if(!window.UAESNameSpace){
+      window.UAESNameSpace = {};
+    }
+    UAESNameSpace.a2lFiles = [];
+    UAESNameSpace.hexFiles = [];
+    UAESNameSpace.parseResults  = [];
+    /*
+      define resource
+    */
+    var resource = {
+      bootstrap: [
+        "library/bootstrap/bootstrap.css",
+        "library/bootstrap/bootstrap.min.js"
+
+      ],
+      bootstrap_easyWizard: [
+        "library/bootstrap/easyWizard/easyWizard.css",
+        "library/bootstrap/easyWizard/easyWizard.js"
+      ],
+      jquery_fileinput: [
+        "library/jquery/UIComponents/fileinput/jquery-filestyle.min.css",
+        "library/jquery/UIComponents/fileinput/jquery-filestyle.min.js"
+      ],
+      jquery_ui: [
+        "library/jquery/jquery-ui-1.12.1/jquery-ui.min.css",
+        "library/jquery/jquery-ui-1.12.1/jquery-ui.min.js"
+      ],
+      jquery_select2: [
+        "library/jquery/UIComponents/select2/select2.min.css",
+        "library/jquery/UIComponents/select2/select2.min.js"
+      ],
+      dashboard: [
+        "assets/dashboard.css"
+      ],
+      bootstrap_select: [
+        "library/bootstrap/select/bootstrap-select.min.css",
+        "library/bootstrap/select/bootstrap-select.min.js"
+      ],
+      ASAMFileParser: [
+        "library/ASAM/fileParser.js"
+      ],
+      justForMe: [
+        "assets/measurement_analyze.js"
+      ]
+      /*vue: [
+        "library/vue/vue.js"
+      ]
+      */
+    };
+
+    var require = function(resource = {}){
+      for (const n in resource){
+        for ( const path of resource[n]){
+          if (path.substr(path.length-3, 3) == ".js") {
+            let js = document.createElement("script");
+            js.src = path;
+            js.defer = true;
+            document.querySelector("head").appendChild(js);
+          }
+          else if (path.substr(path.length-4, 4) == ".css") {
+            let css = document.createElement("link");
+            css.rel = "stylesheet";
+            css.href = path;
+            document.querySelector("head").appendChild(css);
+          }
+        }
+      }
+    }
+
+    require(resource);
+  </script>
+</head>
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">检查机动队</a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#">Dashboard</a></li>
+          <li><a href="#">Settings</a></li>
+          <li><a href="#">Profile</a></li>
+          <li><a href="#">Help</a></li>
+        </ul>
+        <form class="navbar-form navbar-right">
+          <input type="text" class="form-control" placeholder="Search...">
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+          <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+          <li><a href="#">Reports</a></li>
+          <li><a href="#">Analytics</a></li>
+          <li><a href="#">Export</a></li>
+        </ul>
+        <ul class="nav nav-sidebar">
+          <li><a href="">Nav item</a></li>
+          <li><a href="">Nav item again</a></li>
+          <li><a href="">One more nav</a></li>
+          <li><a href="">Another nav item</a></li>
+          <li><a href="">More navigation</a></li>
+        </ul>
+        <ul class="nav nav-sidebar">
+          <li><a href="">Nav item again</a></li>
+          <li><a href="">One more nav</a></li>
+          <li><a href="">Another nav item</a></li>
+        </ul>
+      </div>
+
+      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <!--
+        <div class="page-header">
+          <h3>Measurement Analyze Online</h3>
+        </div>
+      -->
+
+        <!-- top: toolbar -->
+        <div class="row" style="border-bottom:1px solid #ddd;padding-bottom:3px;">
+          <div class="btn-toolbar" role="toolbar">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default" onfocus="this.blur()" data-toggle="modal" data-target="#id-dialog-forToolbar">Create</button>
+              <button type="button" class="btn btn-default" onfocus="this.blur()">Save</button>
+              <button type="button" class="btn btn-default" onfocus="this.blur()">Clear</button>
+            </div>
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default">Left</button>
+              <button type="button" class="btn btn-default">Middle</button>
+              <button type="button" class="btn btn-default">Right</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- dialog for toolbar -->
+        <div id="id-dialog-forToolbar" class="modal fade" aria-hidden="true" data-backdrop="false">
+          <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="cursor: move;">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="myModalLabel">Create new graph</h4>
+                </div>
+                <div class="modal-body">
+                  <form class="form-horizontal">
+                    <!-- graph name-->
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">Graph name:</label>
+                      <div class="col-md-8">
+                        <input type="text" class="form-control" id="id-input-graphName" placeholder="graph01" />
+                      </div>
+                    </div>
+                    <!-- graph type -->
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">Type & Config:</label>
+                      <div class="col-md-4">
+                        <select id="id-select-graphType" class="selectpicker" data-live-search="true" data-width="fit">
+                          <option>折线图</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <select id="id-select-graphConfig" class="selectpicker" data-live-search="true" data-width="fit">
+                        </select>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-primary">OK</button>
+                </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal -->
+        </div>
+
+        <!-- body: painter area -->
+        <div id="id-tabs-painter" class="row">
+          <ul>
+
+          </ul>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+
+<!-- js running on this index page -->
+<script>
+  window.addEventListener("load", function(){
+    //initialize dialog for toolbar
+    $("#id-dialog-forToolbar").draggable({
+      handle: ".modal-header"
+    });
+
+
+    $(function(){
+      var tabTitle = $( "#tab_title" ),
+          tabContent = $( "#tab_content" ),
+          tabTemplate = "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>",
+          tabCounter = 1;
+      var tabs = $("#id-tabs-painter").tabs();
+
+      tabs.on("click", "span.ui-icon-close", function(){
+        var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
+        $( "#id-" + panelId ).remove();
+        tabs.tabs( "refresh" );
+      });
+
+      $("div #id-dialog-forToolbar .btn-primary").on("click", function(){
+        addTab();
+        $("#id-dialog-forToolbar").modal("hide");
+      });
+
+      function addTab(graphName){
+        var label = tabTitle.val() || "Tab " + tabCounter,
+            id = "tabs-" + tabCounter,
+            li = $( tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) ),
+            tabContentHtml = tabContent.val() || "Tab " + tabCounter + " content.";
+
+        tabs.find( ".ui-tabs-nav" ).append( li );
+        tabs.append( "<div id='" + id + "'><p>" + tabContentHtml + "</p></div>" );
+        tabs.tabs( "refresh" );
+        tabCounter++;
+
+        // swtich to latest tab (import!)
+        tabs.tabs("option", "active", -1)
+      }
+
+    });
+
+
+
+    // initialize the painter area
+
+    d3.select("#id-tabs-1").goblinsD3Painter();
+
+    //
+
+  });
+
+  // test1
+  kkk = [1,2,3]
+
+  var vue_checkResult_col1 = new Vue({
+    el: "#id-checkResult-name",
+    data: {
+      list: UAESNameSpace.parseResults
+    }
+  });
+  // test1 end
+
+  // test2
+  var demoChannel = [{x:1, y:1}, {x:2, y:4}, {x:1.2, y:8.2}, {x:3.9, y:0.8}];
+</script>

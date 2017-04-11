@@ -33,7 +33,7 @@ if (d3.selection){
 
     this.initialize = function(
       padding = {left:50,top:50,right:50,bottom:50},
-      boxSize = {width:1000,height:500},
+      boxSize = {width:800,height:500},
       widthRatio = 0.9
       ){
       if (this.state == "uninitialized"){
