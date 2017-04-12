@@ -21,7 +21,8 @@ if (d3){
     this.prevView = {};
     this.nextView = {};
     this.__proto__.initialize = initialize;
-
+    this.__proto__.updateAxis = updateAxis;
+    this.__proto__.addPlot = addPlot;
 
     this.get_channelList = function(mdf){
       if (d3["UAESMDA"]){
@@ -169,17 +170,18 @@ if (d3){
       else if (viewMode == "seperate"){}
     }
 
-    initialize();
+    initialize({type:"line"});
 
 
     return this;
 
-    function initialize(
+    function initialize({
+      type = "line",
       padding = {left:50,top:50,right:50,bottom:50},
       boxSize = {width:800,height:500},
       widthRatio = 0.9
-      ){
-      var parent, svg, id, dataRegister=[],
+      }){
+      var parent, graph, svg, id, dataRegister=[],
           x1, x1Axis, dom_x1Axis, x2, x2Axis, dom_x2Axis, y1, y1Axis, dom_y1Axis, y2, y2Axis, dom_y2Axis,
           line, graphViewBox, borderLayer, shadeLayer, hideLayer,
           pathGroup, legendGroup, channelList=[], fontFamily, fontSize, master, toolbar;
@@ -188,18 +190,23 @@ if (d3){
                       "x2":(widthRatio*boxSize.width+0.5),
                       "y2":(boxSize.height-padding.bottom)};
       parent = root;
-
-      x1  = d3.scaleLinear().domain([0, 0]).range([graphViewBox.x1, graphViewBox.x2-0.5]);
-      x2  = d3.scaleLinear().domain([0, 0]).range([graphViewBox.x1, graphViewBox.x2-0.5]);
-      y1 = d3.scaleLinear().domain([0, 0]).range([graphViewBox.y2, graphViewBox.y1-0.5]);
-      y2 = d3.scaleLinear().domain([0, 0]).range([graphViewBox.y2, graphViewBox.y1-0.5]);
-
       x1Axis = d3.axisBottom(x1).tickSize([0]);
-      x2Axis = d3.axisTop(x2).tickSize([0]);
-      y1Axis = d3.axisLeft(y1).tickSize([0]);//(y1.ticks().length>4)?d3.axisLeft(y1).ticks(4):d3.axisLeft(y1);
       y2Axis = d3.axisRight(y2).tickSize([0]);
+      parent = root, id = performance.now().toString().replace(".", "--");
 
-      svg = parent.append("svg")
+      x1 = d3.scaleLinear().domain([0, 10]).range([graphViewBox.x1, graphViewBox.x2-0.5]);
+      x2 = d3.scaleLinear().domain([0, 10]).range([graphViewBox.x1, graphViewBox.x2-0.5]);
+      y1 = d3.scaleLinear().domain([0, 10]).range([graphViewBox.y2, graphViewBox.y1-0.5]);
+      y2 = d3.scaleLinear().domain([0, 10]).range([graphViewBox.y2, graphViewBox.y1-0.5]);
+
+      x1Axis = d3.axisBottom(x1).tickSize([6]);
+      x2Axis = d3.axisTop(x2).tickSize([6]);
+      y1Axis = d3.axisLeft(y1).tickSize([6]);//(y1.ticks().length>4)?d3.axisLeft(y1).ticks(4):d3.axisLeft(y1);
+      y2Axis = d3.axisRight(y2).tickSize([6]);
+
+      parent.append("br");
+      graph = parent.append("div")
+                    .attr("contenteditable", false)
                   .attr("class", "css-d3-graph")
                   .attr("active", "true")
                   .attr("width", boxSize.width)
@@ -250,11 +257,13 @@ if (d3){
       pathGroup   = svg.append("g").attr("clip-path", "url(#shadeLayer_"+id+")");
 
       root.state = "initialized";
-      root.__proto__.x1 = x1, root.x2 = x2, root.y1 = y1, root.y2 = y2;
       root.__proto__.x1Axis = x1Axis;
       root.__proto__.dom_x1Axis = dom_x1Axis;
 
-      return this;
+
+
+
+
     }
   }
 
