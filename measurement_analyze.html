@@ -16,7 +16,7 @@
     */
     var resource = {
       bootstrap: [
-        "library/bootstrap/bootstrap.css",
+        "library/bootstrap/theme/paper/paper.min.css",
         "library/bootstrap/bootstrap.min.js"
 
       ],
@@ -76,10 +76,84 @@
 
     require(resource);
   </script>
+  <style>
+    /* global*/
+    div:focus{
+      outline: none;
+    }
+    .css-d3-graph{
+      position: relative;
+    }
+    .css-d3-graph .css-d3-path:hover{
+      filter: url(#id-svg-filter-glow);
+    }
+    .css-d3-graph .css-d3-path:focus{
+      filter: url(#id-svg-filter-glow);
+      outline: none;
+    }
+    /* legend table */
+    .css-d3-legendTable{
+      border: 1px solid #ddd;
+      position: absolute;
+      left: 0;
+      top: 0;
+      padding: 3px;
+      font-family: "Consolas";
+      font-size-adjust: auto;
+    }
+    .css-d3-legendTable-td{
+      width: 36px;
+      height: 20px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .css-d3-legend-svgBox, .css-d3-legend-svgBox rect{
+      width: 24px;
+      height: 12px;
+    }
+
+    /* cursor style */
+    .css-d3-cursor:hover{
+      cursor: ew-resize;
+    }
+    .css-d3-cursor:focus{
+      cursor: ew-resize;
+    }
+
+    .css-d3-graph{
+      cursor: pointer;
+    }
+    .css-d3-graph:before{
+      content: ""
+    }
+    .css-d3-graph:after{
+      content: ""
+    }
+    /* change the height of navbar*/
+    .navbar-nav>li>a {
+      padding-top: 10.5px;
+      padding-bottom: 10.5px;
+    }
+    .navbar-brand {
+      height: 40px;
+      padding-top: 10px;
+    }
+    .navbar {
+      min-height: 40px;
+    }
+    .navbar-toggle {
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+    /* line and cursor don't scale */
+    .css-d3-line, .css-d3-cursor {
+      vector-effect: non-scaling-stroke;
+    }
+  </style>
 </head>
 <body>
-  <nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container-fluid">
+  <nav class="navbar navbar-default navbar-fixed-top" style="height:44px; margin-bottom:13px;">
+    <div class="container">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
           <span class="sr-only">Toggle navigation</span>
@@ -88,7 +162,31 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="#">检查机动队</a>
+        <ul class="nav navbar-nav">
+          <li><a id="id-btn-toolbar-create" href="#" onfocus="this.blur()" data-toggle="modal" data-target="#id-dialog-forToolbar">Create</a></li>
+          <li><a id="id-btn-toolbar-save" href="#" onfocus="this.blur()">Save</a></li>
+          <li><a id="id-btn-toolbar-data" href="#" onfocus="this.blur()" data-toggle="modal" data-target="#id-dialog-data">Data</a></li>
+
+          <li>
+            <a id="id-btn-toolbar-insert" href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Insert
+            <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="id-btn-toolbar-insert">
+              <li><a id="id-btn-insert-graph" href="#">Graph</a></li>
+              <li><a id="id-btn-insert-plot" href="#" data-toggle="modal" data-target="#id-dialog-addPlot">Plot</a></li>
+              <li><a id="id-btn-insert-cursor" href="#">Cursor</a></li>
+              <li><a href="#">Formula</a></li>
+              <li><a href="#">Shape</a></li>
+              <li><a href="#">Picture</a></li>
+            </ul>
+          </li>
+
+          <li><a href="#">Imort</a></li>
+          <li><a id="id-btn-cursorMode" href="#">Cursor</a></li>
+        </ul>
       </div>
+      <!--
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right">
           <li><a href="#">Dashboard</a></li>
@@ -100,11 +198,23 @@
           <input type="text" class="form-control" placeholder="Search...">
         </form>
       </div>
+      -->
+      <div class="navbar-collapse collapse" aria-expanded = "false" style="height:1px;">
+        <ul class="nav navbar-nav">
+          <li><a href="#">a1</a></li>
+          <li><a href="#">b2</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#">User</a></li>
+          <li><a href="#">Setting</a></li>
+        </ul>
+      </div>
     </div>
   </nav>
 
-  <div class="container-fluid">
+  <div class="container">
     <div class="row">
+      <!-- sidebar
       <div class="col-sm-3 col-md-2 sidebar">
         <ul class="nav nav-sidebar">
           <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
@@ -125,31 +235,15 @@
           <li><a href="">Another nav item</a></li>
         </ul>
       </div>
-
-      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+      -->
+      <div class="col-sm-10 col-md-12 main" style="margin:0 auto;">
         <!--
         <div class="page-header">
           <h3>Measurement Analyze Online</h3>
         </div>
       -->
 
-        <!-- top: toolbar -->
-        <div class="row" style="border-bottom:1px solid #ddd;padding-bottom:3px;">
-          <div class="btn-toolbar" role="toolbar">
-            <div class="btn-group" role="group">
-              <button type="button" class="btn btn-default" onfocus="this.blur()" data-toggle="modal" data-target="#id-dialog-forToolbar">Create</button>
-              <button type="button" class="btn btn-default" onfocus="this.blur()">Save</button>
-              <button type="button" class="btn btn-default" onfocus="this.blur()">Clear</button>
-            </div>
-            <div class="btn-group" role="group">
-              <button type="button" class="btn btn-default">Left</button>
-              <button type="button" class="btn btn-default">Middle</button>
-              <button type="button" class="btn btn-default">Right</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- dialog for toolbar -->
+        <!-- dialog for toolbar - create page -->
         <div id="id-dialog-forToolbar" class="modal fade" aria-hidden="true" data-backdrop="false">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -163,12 +257,12 @@
                     <div class="form-group">
                       <label class="col-md-3 control-label">Graph name:</label>
                       <div class="col-md-8">
-                        <input type="text" class="form-control" id="id-input-graphName" placeholder="graph01" />
+                        <input type="text" class="form-control" id="id-input-graphName" placeholder="graph name" />
                       </div>
                     </div>
                     <!-- graph type -->
                     <div class="form-group">
-                      <label class="col-md-3 control-label">Type & Config:</label>
+                      <label class="col-md-3 control-label">Type - Config:</label>
                       <div class="col-md-4">
                         <select id="id-select-graphType" class="selectpicker" data-live-search="true" data-width="fit">
                           <option>折线图</option>
@@ -189,12 +283,144 @@
           </div><!-- /.modal -->
         </div>
 
+        <!-- dialog for toolbar - add plot -->
+        <div id="id-dialog-addPlot" class="modal fade" aria-hidden="true" data-backdrop="false">
+          <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="cursor: move;">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="">Add new plot</h4>
+                </div>
+                <div class="modal-body">
+                  <form class="form-horizontal">
+                    <!-- graph name-->
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">Graph name:</label>
+                      <div class="col-md-8">
+                        <input type="text" class="form-control" id="" placeholder="graph name" />
+                      </div>
+                    </div>
+                    <!-- graph type -->
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">Type - Config:</label>
+                      <div class="col-md-4">
+                        <select id="id-select-mdfFile" class="selectpicker" data-live-search="true" data-width="fit">
+                          <option>dat file1</option>
+                          <option>dat file2</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <select id="id-select-channel" class="selectpicker" data-live-search="true" data-width="fit">
+                          <option>testChannel.d1</option>
+                          <option>testChannel.d2</option>
+                          <option>testChannel.d3</option>
+                          <option>testChannel.y1</option>
+                          <option>testChannel.y2</option>
+                          <option>testChannel.y3</option>
+                          <option>testChannel.y4</option>
+                          <option>testChannel.y5</option>
+                        </select>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-primary">OK</button>
+                </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal -->
+        </div>
+
+        <!-- dialog for toolbar - data management -->
+        <div id="id-dialog-data" class="modal fade" aria-hidden="true" data-backdrop="false">
+          <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="cursor: move;">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title" id="">Data Management</h4>
+                </div>
+                <div class="modal-body">
+                  <form class="form-horizontal">
+                    <!-- import mdf-->
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">Import DAT:</label>
+                      <div class="col-md-8">
+                        <input id="id-a2lFileInput" type="file" class="jfilestyle" data-placeholder="请添加一个DAT文件" data-inputSize="fit">
+                      </div>
+                    </div>
+
+                    <!-- imported mdf list-->
+                    <ul class="list-group" style="max-height:300px;overflow-y:scroll;">
+                      <li class="list-group-item">1.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">2.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">3.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">1.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">2.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">3.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">1.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">2.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">3.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">1.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">2.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">3.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">1.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">2.dat<span class="badge">remove</span></li>
+                      <li class="list-group-item">3.dat<span class="badge">remove</span></li>
+                    </ul>
+
+                    <!-- graph type -->
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">Graph Used Channel:</label>
+                      <div class="col-md-4">
+                        <select id="id-select-mdfFile" class="selectpicker" data-live-search="true" data-width="fit">
+                          <option>graph 1</option>
+                          <option>graph 2</option>
+                        </select>
+                      </div>
+                      <div class="col-md-4">
+                        <select id="id-select-channel" class="selectpicker" data-live-search="true" data-width="fit">
+                          <option>testChannel.d1</option>
+                          <option>testChannel.d2</option>
+                          <option>testChannel.d3</option>
+                        </select>
+                      </div>
+                    </div>
+                  </form>
+
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-primary">OK</button>
+                </div>
+            </div><!-- /.modal-content -->
+          </div><!-- /.modal -->
+        </div>
+
         <!-- body: painter area -->
-        <div id="id-tabs-painter" class="row">
+        <div id="id-tabs-painter" class="row" style="margin-top: -12px;">
           <ul>
-
+            <!--some li of tabs head-->
           </ul>
-
+          <svg width="0" height="0">
+            <defs>
+              <filter id="id-svg-filter-glow">
+                <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+              <filter id="id-svg-filter-glow-cursor" x="-2" y="-2" width="200" height="200">
+                <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+          </svg>
+          <!--some div of tabs content-->
         </div>
 
       </div>
@@ -205,22 +431,30 @@
 <!-- js running on this index page -->
 <script>
   window.addEventListener("load", function(){
-    //initialize dialog for toolbar
-    $("#id-dialog-forToolbar").draggable({
+    //all modals are draggable
+    $("div.modal").draggable({
       handle: ".modal-header"
     });
 
 
+    // modal for create page
     $(function(){
-      var tabTitle = $( "#tab_title" ),
+      // bind cursor postion change event
+      document.onselectionchange = function(){
+
+      }
+
+      // $ functions initialize
+      var tabTitle = $( "#id-input-graphName" ),
           tabContent = $( "#tab_content" ),
           tabTemplate = "<li><a href='#{href}'>#{label}</a> <span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>",
           tabCounter = 1;
+
       var tabs = $("#id-tabs-painter").tabs();
 
       tabs.on("click", "span.ui-icon-close", function(){
         var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
-        $( "#id-" + panelId ).remove();
+        $( "#" + panelId ).remove();
         tabs.tabs( "refresh" );
       });
 
@@ -229,35 +463,97 @@
         $("#id-dialog-forToolbar").modal("hide");
       });
 
+      // insert graph
+      $("#id-btn-insert-graph").on("click", function(){
+        var activePanelId = $("ul[role='tablist'] > li[aria-selected='true']").attr("aria-controls");
+        //d3.select("#" + activePanelId).goblinsD3Painter();
+        d3.activeGraph = new goblinsD3Painter(d3.select("#" + activePanelId));
+      })
+
+      // insert cursor
+      $("#id-btn-insert-cursor").on("click", function(){
+        let cursorGroup = d3.activeGraph.cursorGroup;
+        let x = d3.activeGraph.x1, y = d3.activeGraph.y1;
+        let graphViewBox = d3.activeGraph.graphViewBox;
+        //let line = d3.line().x(d => x(d["x"])).y(d => y(d["y"]));
+        cursorGroup.append("g")
+                   .attr("class", "css-d3-cursor")
+                    .append("rect")
+                    .attr("x", graphViewBox.x1)
+                    .attr("y", graphViewBox.y1)
+                    .attr("width", 0.5)
+                    .attr("height", graphViewBox.y2 - graphViewBox.y1)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1)
+                    .attr("fill", "none")
+                    .call(d3.drag()
+                      .on("start", function(){
+                      })
+                      .on("drag", function(){
+                        d3.select(this).attr("x", d3.event.x)
+                        console.log(d3.event.x, d3.event.y);
+                      })
+                      .on("end", function(){
+                      })
+                    );
+      })
+
+      // cursormode
+      $("#id-btn-cursorMode").on("click", function(){
+        if (!d3.cursorMode) {
+          d3.cursorMode = true;
+        } else {
+          d3.cursorMode = !(d3.cursorMode);
+        }
+        if (d3.cursorMode) {
+          let floatCursor = d3.activeGraph.floatCursor;
+          //floatCursor
+        }
+      });
+
       function addTab(graphName){
-        var label = tabTitle.val() || "Tab " + tabCounter,
+        //#id-input-graphName
+        var label = tabTitle.val() || "graph " + tabCounter,
             id = "tabs-" + tabCounter,
             li = $( tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ) ),
-            tabContentHtml = tabContent.val() || "Tab " + tabCounter + " content.";
+            tabContentHtml = tabContent.val() || "Page " + tabCounter + " Title";
 
         tabs.find( ".ui-tabs-nav" ).append( li );
-        tabs.append( "<div id='" + id + "'><p>" + tabContentHtml + "</p></div>" );
+        tabs.append( "<div id='" + id + "' contenteditable='true' spellcheck='false'><h3>" + tabContentHtml + "</h3></div>" );
         tabs.tabs( "refresh" );
         tabCounter++;
 
         // swtich to latest tab (import!)
-        tabs.tabs("option", "active", -1)
+        tabs.tabs("option", "active", -1);
       }
+
+      // $ functions initialize end!
+    });
+
+    // modal -  insert plot
+    $(function(){
+      $("div #id-dialog-addPlot .btn-primary").on("click", function(){
+        let data = eval($("#id-select-channel").val());
+        d3.activeGraph.addPlot({data:data});
+        $("#id-dialog-addPlot").modal("hide");
+      });
+    });
+
+    //
+    $(function(){
 
     });
 
-
-
     // initialize the painter area
 
-    d3.select("#id-tabs-1").goblinsD3Painter();
+    //d3.select("#id-tabs-1").goblinsD3Painter();
 
     //
 
   });
 
   // test1
-  kkk = [1,2,3]
+  /*kkk = [1,2,3]
 
   var vue_checkResult_col1 = new Vue({
     el: "#id-checkResult-name",
@@ -265,8 +561,30 @@
       list: UAESNameSpace.parseResults
     }
   });
+  */
+
   // test1 end
 
-  // test2
-  var demoChannel = [{x:1, y:1}, {x:2, y:4}, {x:1.2, y:8.2}, {x:3.9, y:0.8}];
+  // test2: simulate data array for plot
+  let [y1, y2, y3, y4, y5, time] = [[], [], [], [], [], []];
+  for (let i=1; i<=1000; i++){
+    time.push(i);
+    y1.push(Math.sin(i));
+    y2.push(Math.sin(i)*Math.cos(i));
+    y3.push(Math.E*Math.sin(i));
+    y4.push(Math.sin(i)+Math.cos(i)+5 );
+    y5.push(Math.sin(i)/Math.cos(i));
+  }
+  var testChannel = {
+    d1: [{x:1, y:20}, {x:2, y:0}, {x:3, y:1}, {x:4, y:2}],
+    d2: [{x:1, y:0.5}, {x:2, y:1}, {x:3, y:0.5}, {x:4, y:2}],
+    d3: [{x:1, y:2}, {x:2, y:0.7}, {x:3, y:3.2}, {x:4, y:0.8}],
+    y1: y1.map(function(d, i){return {x: time[i], y:d}}),
+    y2: y2.map(function(d, i){return {x: time[i], y:d}}),
+    y3: y3.map(function(d, i){return {x: time[i], y:d}}),
+    y4: y4.map(function(d, i){return {x: time[i], y:d}}),
+    y5: y5.map(function(d, i){return {x: time[i], y:d}})
+  }
+
+  var temp2;
 </script>
