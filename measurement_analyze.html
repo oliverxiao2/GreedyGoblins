@@ -16,7 +16,7 @@
     */
     var resource = {
       bootstrap: [
-        "library/bootstrap/bootstrap.css",
+        "library/bootstrap/theme/paper/paper.min.css",
         "library/bootstrap/bootstrap.min.js"
 
       ],
@@ -84,11 +84,12 @@
     .css-d3-graph{
       position: relative;
     }
-    .css-d3-graph .css-d3-line:hover{
+    .css-d3-graph .css-d3-path:hover{
       filter: url(#id-svg-filter-glow);
     }
-    .css-d3-graph .css-d3-line:focus{
+    .css-d3-graph .css-d3-path:focus{
       filter: url(#id-svg-filter-glow);
+      outline: none;
     }
     /* legend table */
     .css-d3-legendTable{
@@ -96,8 +97,10 @@
       position: absolute;
       left: 0;
       top: 0;
+      padding: 3px;
+      font-family: "Consolas";
+      font-size-adjust: auto;
     }
-
     .css-d3-legendTable-td{
       width: 36px;
       height: 20px;
@@ -109,20 +112,48 @@
       height: 12px;
     }
 
+    /* cursor style */
+    .css-d3-cursor:hover{
+      cursor: ew-resize;
+    }
+    .css-d3-cursor:focus{
+      cursor: ew-resize;
+    }
+
     .css-d3-graph{
       cursor: pointer;
     }
     .css-d3-graph:before{
-      content: "before"
+      content: ""
     }
     .css-d3-graph:after{
-      content: "after"
+      content: ""
+    }
+    /* change the height of navbar*/
+    .navbar-nav>li>a {
+      padding-top: 10.5px;
+      padding-bottom: 10.5px;
+    }
+    .navbar-brand {
+      height: 40px;
+      padding-top: 10px;
+    }
+    .navbar {
+      min-height: 40px;
+    }
+    .navbar-toggle {
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+    /* line and cursor don't scale */
+    .css-d3-line, .css-d3-cursor {
+      vector-effect: non-scaling-stroke;
     }
   </style>
 </head>
 <body>
-  <nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container-fluid">
+  <nav class="navbar navbar-default navbar-fixed-top" style="height:44px; margin-bottom:13px;">
+    <div class="container">
       <div class="navbar-header">
         <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
           <span class="sr-only">Toggle navigation</span>
@@ -143,8 +174,8 @@
             </a>
             <ul class="dropdown-menu" aria-labelledby="id-btn-toolbar-insert">
               <li><a id="id-btn-insert-graph" href="#">Graph</a></li>
-              <li><a id="id-btn-insert-cursor" href="#" data-toggle="modal" data-target="#id-dialog-addPlot">Plot</a></li>
-              <li><a href="#">Table</a></li>
+              <li><a id="id-btn-insert-plot" href="#" data-toggle="modal" data-target="#id-dialog-addPlot">Plot</a></li>
+              <li><a id="id-btn-insert-cursor" href="#">Cursor</a></li>
               <li><a href="#">Formula</a></li>
               <li><a href="#">Shape</a></li>
               <li><a href="#">Picture</a></li>
@@ -168,11 +199,22 @@
         </form>
       </div>
       -->
+      <div class="navbar-collapse collapse" aria-expanded = "false" style="height:1px;">
+        <ul class="nav navbar-nav">
+          <li><a href="#">a1</a></li>
+          <li><a href="#">b2</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#">User</a></li>
+          <li><a href="#">Setting</a></li>
+        </ul>
+      </div>
     </div>
   </nav>
 
-  <div class="container-fluid">
+  <div class="container">
     <div class="row">
+      <!-- sidebar
       <div class="col-sm-3 col-md-2 sidebar">
         <ul class="nav nav-sidebar">
           <li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
@@ -193,8 +235,8 @@
           <li><a href="">Another nav item</a></li>
         </ul>
       </div>
-
-      <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+      -->
+      <div class="col-sm-10 col-md-12 main" style="margin:0 auto;">
         <!--
         <div class="page-header">
           <h3>Measurement Analyze Online</h3>
@@ -272,6 +314,11 @@
                           <option>testChannel.d1</option>
                           <option>testChannel.d2</option>
                           <option>testChannel.d3</option>
+                          <option>testChannel.y1</option>
+                          <option>testChannel.y2</option>
+                          <option>testChannel.y3</option>
+                          <option>testChannel.y4</option>
+                          <option>testChannel.y5</option>
                         </select>
                       </div>
                     </div>
@@ -351,14 +398,21 @@
         </div>
 
         <!-- body: painter area -->
-        <div id="id-tabs-painter" class="row" style="top:36px;overflow-y:scroll;">
+        <div id="id-tabs-painter" class="row" style="margin-top: -12px;">
           <ul>
             <!--some li of tabs head-->
           </ul>
           <svg width="0" height="0">
             <defs>
-              <filter id="id-svg-filter-glow" x="-2" y="-2" width="200" height="200">
+              <filter id="id-svg-filter-glow">
                 <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+              <filter id="id-svg-filter-glow-cursor" x="-2" y="-2" width="200" height="200">
+                <feGaussianBlur stdDeviation="1.5" result="coloredBlur" />
                 <feMerge>
                   <feMergeNode in="coloredBlur" />
                   <feMergeNode in="SourceGraphic" />
@@ -412,8 +466,50 @@
       // insert graph
       $("#id-btn-insert-graph").on("click", function(){
         var activePanelId = $("ul[role='tablist'] > li[aria-selected='true']").attr("aria-controls");
-        d3.select("#" + activePanelId).goblinsD3Painter();
+        //d3.select("#" + activePanelId).goblinsD3Painter();
+        d3.activeGraph = new goblinsD3Painter(d3.select("#" + activePanelId));
       })
+
+      // insert cursor
+      $("#id-btn-insert-cursor").on("click", function(){
+        let cursorGroup = d3.activeGraph.cursorGroup;
+        let x = d3.activeGraph.x1, y = d3.activeGraph.y1;
+        let graphViewBox = d3.activeGraph.graphViewBox;
+        //let line = d3.line().x(d => x(d["x"])).y(d => y(d["y"]));
+        cursorGroup.append("g")
+                   .attr("class", "css-d3-cursor")
+                    .append("rect")
+                    .attr("x", graphViewBox.x1)
+                    .attr("y", graphViewBox.y1)
+                    .attr("width", 0.5)
+                    .attr("height", graphViewBox.y2 - graphViewBox.y1)
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1)
+                    .attr("fill", "none")
+                    .call(d3.drag()
+                      .on("start", function(){
+                      })
+                      .on("drag", function(){
+                        d3.select(this).attr("x", d3.event.x)
+                        console.log(d3.event.x, d3.event.y);
+                      })
+                      .on("end", function(){
+                      })
+                    );
+      })
+
+      // cursormode
+      $("#id-btn-cursorMode").on("click", function(){
+        if (!d3.cursorMode) {
+          d3.cursorMode = true;
+        } else {
+          d3.cursorMode = !(d3.cursorMode);
+        }
+        if (d3.cursorMode) {
+          let floatCursor = d3.activeGraph.floatCursor;
+          //floatCursor
+        }
+      });
 
       function addTab(graphName){
         //#id-input-graphName
@@ -423,7 +519,7 @@
             tabContentHtml = tabContent.val() || "Page " + tabCounter + " Title";
 
         tabs.find( ".ui-tabs-nav" ).append( li );
-        tabs.append( "<div id='" + id + "' contenteditable='true'><h3>" + tabContentHtml + "</h3></div>" );
+        tabs.append( "<div id='" + id + "' contenteditable='true' spellcheck='false'><h3>" + tabContentHtml + "</h3></div>" );
         tabs.tabs( "refresh" );
         tabCounter++;
 
@@ -434,7 +530,7 @@
       // $ functions initialize end!
     });
 
-    // modal for add plot
+    // modal -  insert plot
     $(function(){
       $("div #id-dialog-addPlot .btn-primary").on("click", function(){
         let data = eval($("#id-select-channel").val());
@@ -470,10 +566,24 @@
   // test1 end
 
   // test2: simulate data array for plot
+  let [y1, y2, y3, y4, y5, time] = [[], [], [], [], [], []];
+  for (let i=1; i<=1000; i++){
+    time.push(i);
+    y1.push(Math.sin(i));
+    y2.push(Math.sin(i)*Math.cos(i));
+    y3.push(Math.E*Math.sin(i));
+    y4.push(Math.sin(i)+Math.cos(i)+5 );
+    y5.push(Math.sin(i)/Math.cos(i));
+  }
   var testChannel = {
-    d1: [{x:1, y:1}, {x:2, y:0}, {x:3, y:1}, {x:4, y:2}],
+    d1: [{x:1, y:20}, {x:2, y:0}, {x:3, y:1}, {x:4, y:2}],
     d2: [{x:1, y:0.5}, {x:2, y:1}, {x:3, y:0.5}, {x:4, y:2}],
-    d3: [{x:1, y:2}, {x:2, y:0.7}, {x:3, y:3.2}, {x:4, y:0.8}]
+    d3: [{x:1, y:2}, {x:2, y:0.7}, {x:3, y:3.2}, {x:4, y:0.8}],
+    y1: y1.map(function(d, i){return {x: time[i], y:d}}),
+    y2: y2.map(function(d, i){return {x: time[i], y:d}}),
+    y3: y3.map(function(d, i){return {x: time[i], y:d}}),
+    y4: y4.map(function(d, i){return {x: time[i], y:d}}),
+    y5: y5.map(function(d, i){return {x: time[i], y:d}})
   }
 
   var temp2;
