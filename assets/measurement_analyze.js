@@ -452,14 +452,14 @@ d3.selection.prototype.kkkkgoblinsD3Painter = function(){
       pathGroup.append("g")
                .attr("id", "id-d3-path-" + randomID)
                .attr("class", "css-d3-path")
-               .on("focusin", function(){
+               /*.on("focusin", function(){
                  focusIn(this, "plot");
                  console.log("focusin");
                })
                .on("focusout", function(){
                  focusOut(this, "plot");
                  console.log("focusout")
-               })
+               })*/
                 .append("path")
                 .attr("class", "css-d3-line")
                 .datum(data)
@@ -944,7 +944,9 @@ var goblinsD3Painter = function(d3Selection){
     */
     function focusIn(element, type){
       let clicked = d3.select(element);
-      if (type == "plot") d3.activeGraph.activePlot = clicked;
+      if (type == "plot") {
+        d3.activeGraph.activePlot = clicked;
+      }
       else if (type == "cursor") {
         d3.activeGraph.activeCursor = clicked;
 
@@ -981,7 +983,7 @@ var goblinsD3Painter = function(d3Selection){
 
       // zoom for all cursors
       let yDomain = g_tran_y1.domain();
-      console.log(yDomain);
+
       g_graph.selectAll(".css-d3-cursor").each(function(){
         let data = d3.select(this).datum();
         let line = d3.line().x(d => g_x1(d["x"])).y(d => g_y1(d["y"])); // import! must use the original x1 and y1!
